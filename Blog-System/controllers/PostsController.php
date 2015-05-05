@@ -11,4 +11,9 @@ class PostsController extends BaseController {
     public function index() {
     	 $this->posts = $this->db->getAll();
     }
+	
+	public function post($id){
+		$this->title = "Post";
+		$this->posts = $this->db->getPost($id);		
+	}
 }

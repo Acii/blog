@@ -14,11 +14,12 @@
         <tr>
         	
             <td><?= $post['id'] ?></td>
-            <td><?= htmlspecialchars($post['title']) ?></td>
+            <td><a href="posts/post/<?=$post['id']?>"><?= htmlspecialchars($post['title']) ?></a></td>
             <td><?= htmlspecialchars($post['description']) ?></td>
-            <td><?= $post['postDate'] ?></td>
-            <td><?= $post['name'] ?></td>
+            <td><?= $post['postDate'] ?></td>  
+            
+            
         </tr>
-    <?php endforeach ?>
+    <?php  endforeach ?>
 </table>
 

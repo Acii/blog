@@ -6,6 +6,7 @@ abstract class BaseController {
     protected $layoutName = DEFAULT_LAYOUT;
     protected $isViewRendered = false;
     protected $isPost = false;
+	protected $isLoggedIn;
 
     function __construct($controllerName, $actionName) {
         $this->controllerName = $controllerName;
@@ -13,6 +14,11 @@ abstract class BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->isPost = true;
         }
+		
+		if(isset($_SESSION['username'])){
+			$this->isLoggedIn = TRUE;
+		}
+		
         $this->onInit();
     }
 
@@ -48,9 +54,15 @@ abstract class BaseController {
         header("Location: " . $url);
         die;
     }
+	
+	public function redirectToPost($url) {
+        header("Location: http://localhost/posts/post/" . $url);
+        die;
+    }
 
     public function redirect(
             $controllerName, $actionName = null, $params = null) {
+            	
         $url = '/' . urlencode($controllerName);
         if ($actionName != null) {
             $url .= '/' . urlencode($actionName);
@@ -61,6 +73,13 @@ abstract class BaseController {
         }
         $this->redirectToUrl($url);
     }
+			
+	public function authorize(){
+		if(! $this->isLoggedIn) {
+			$this->addErrorMessage("Please login first!");
+			$this->redirect('account', 'login');
+		}
+	}
 
     function addMessage($msg, $type) {
         if (!isset($_SESSION['messages'])) {

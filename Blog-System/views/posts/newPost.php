@@ -8,5 +8,7 @@
     <br/>
      Description: <textarea rows="4" cols="50" name="description" required></textarea>
     <br/>
+     Tags: <input type="text" name="tags">
+    <br/>
     <input type="submit" value="Create">
 </form>

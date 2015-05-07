@@ -19,9 +19,16 @@ class PostsController extends BaseController {
 			$username = $_SESSION['username'];
 			$title = $_POST['title'];
 			$description = $_POST['description'];
-			if($this->db->createPost($username, $title, $description)) {
-				$this->addInfoMessage("Successful create new post!");
-				$this->redirect("posts");
+			$tags = $_POST['tags'];
+			$resultTags = preg_split("/[\s,]+/", $tags);					
+			if($title != null && $description != null) {
+				if($this->db->createPost($username, $title, $description,$resultTags)) {
+					$this->addInfoMessage("Successful create new post!");
+					//$this->redirect("posts");
+				}
+			}
+			else {
+				$this->addErrorMessage("Title and Description are required");
 			}
 		}
 	}

@@ -10,7 +10,7 @@
         <th>Date</th>
         <th>Username</th>
     </tr>
-    <?php foreach ($this->posts as $post) :  ?>
+    <?php foreach ($this->posts as $post) :   ?>
         <tr>
         	
             <td><?= htmlspecialchars($post['title']) ?></td>

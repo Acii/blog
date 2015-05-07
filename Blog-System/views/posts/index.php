@@ -10,6 +10,7 @@
         <th>Description</th>
         <th>Date</th>
         <th>Username</th>
+         <th>Tags</th>
     </tr>
     <?php foreach ($this->posts as $post) : ?>
         <tr>
@@ -18,7 +19,8 @@
             <td><a href="posts/post/<?=$post['id']?>"><?= htmlspecialchars($post['title']) ?></a></td>
             <td><?= htmlspecialchars($post['description']) ?></td>
             <td><?= $post['dataCreate'] ?></td> 
-            <td><?= $post['name'] ?></td>   
+            <td><?= $post['name'] ?></td>
+            <td><?= $post['tagTitle'] ?>  </td>
             
             
         </tr>

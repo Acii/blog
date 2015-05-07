@@ -3,7 +3,11 @@
 class PostsModel extends BaseModel {
     public function getAll() {
 		$statement = self::$db->query(
-			"SELECT posts.id, posts.title, posts.description, posts.dataCreate, users.name FROM posts JOIN users ON posts.authorId = users.id ORDER BY posts.id");
+			"SELECT posts.id, posts.title, posts.description, posts.dataCreate, users.name, tags.title AS tagTitle FROM posts 
+			LEFT JOIN poststags ON posts.id = poststags.postId
+			LEFT JOIN tags ON poststags.tagId = tags.id
+			INNER JOIN users ON posts.authorId = users.id
+			ORDER BY posts.dataCreate DESC");
 		$result = $statement->fetch_all(MYSQLI_ASSOC);
         return $result;
     }
@@ -17,7 +21,7 @@ class PostsModel extends BaseModel {
         return $resultSetPost->fetch_all(MYSQLI_ASSOC);
     }
 	
-	public function createPost($username, $title, $description) {
+	public function createPost($username, $title, $description,$tags) {
 		$statement = self::$db->prepare("SELECT COUNT(id) FROM posts WHERE title = ?");
 		$statement->bind_param("s",$title);
 		$statement->execute();
@@ -25,16 +29,52 @@ class PostsModel extends BaseModel {
 		if($result['COUNT(id)']) {
 			return FALSE;
 		}
+		$tagsId = "";
+		$i = 0;
+		foreach ($tags as $tag) {
+			$tagStatement = self::$db->prepare("SELECT id FROM tags WHERE title = ?");
+			$tagStatement->bind_param("s",$tag);
+			$tagStatement->execute();
+			$resultTag = $tagStatement->get_result()->fetch_assoc();
+			if($resultTag != null) {
+				$tagsId[$i] = $resultTag;
+				$i++;
+			} else {
+				$createTagStatement = self::$db->prepare("INSERT INTO tags(title) VALUE(?)");
+				$createTagStatement->bind_param("s", $tag);
+				$createTagStatement->execute();
+				
+				$selectNewTagStatement = self::$db->prepare("SELECT id FROM tags WHERE title = ?");
+				$selectNewTagStatement->bind_param("s",$tag);
+				$selectNewTagStatement->execute();
+				$tagsId[$i] = $selectNewTagStatement->get_result()->fetch_assoc();
+				$i++;
+			}
+			
+		}
+
 		$userStatement = self::$db->prepare("SELECT id FROM users WHERE name = ?");
 		$userStatement->bind_param("s", $username);
 		$userStatement->execute();
 		$resultUser = $userStatement->get_result()->fetch_assoc();
-		var_dump($resultUser['id']);
+
 		
 		$postStatement = self::$db->prepare(
             "INSERT INTO posts (title, description, authorId) VALUES(?,?,?)");
         $postStatement->bind_param("ssi", $title, $description, $resultUser['id']);
         $postStatement->execute();
+		
+		$newPostStatement = self::$db->prepare("SELECT MAX(id) FROM posts");
+		$newPostStatement->execute();
+		$resultNewPost = $newPostStatement->get_result()->fetch_assoc();
+
+		
+		foreach ($tagsId as $tagId) {
+			$postsTagsStatement = self::$db->prepare(
+            	"INSERT INTO poststags (postId, tagId) VALUES(?,?)");
+       		 $postsTagsStatement->bind_param("ii", $resultNewPost['MAX(id)'], $tagId['id']);
+       		 $postsTagsStatement->execute();
+		}
 		return TRUE;
 	}
 	

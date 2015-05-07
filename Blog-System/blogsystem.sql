@@ -45,18 +45,14 @@ CREATE TABLE IF NOT EXISTS `blogsystem`.`tags` (
   UNIQUE INDEX `title_UNIQUE` (`title` ASC));
 
   
- CREATE TABLE IF NOT EXISTS `blogsystem`.`postsTagas` (
+ CREATE TABLE IF NOT EXISTS `blogsystem`.`postsTags` (
   `postId` INT NOT NULL,
   `tagId` INT NOT NULL,
-  INDEX `fk_PostsTagas_Posts1_idx` (`postId` ASC),
   PRIMARY KEY (`postId`, `tagId`),
-  INDEX `fk_postsTagas_Tags1_idx` (`tagId` ASC),
-  CONSTRAINT `fk_PostsTagas_Posts1`
     FOREIGN KEY (`postId`)
     REFERENCES `blogsystem`.`posts` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_postsTagas_Tags1`
     FOREIGN KEY (`tagId`)
     REFERENCES `blogsystem`.`tags` (`id`)
     ON DELETE NO ACTION

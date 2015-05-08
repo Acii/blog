@@ -12,7 +12,7 @@
     <header>
         <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/posts">Posts</a></li>
+            <li><a href="/posts/index">Posts</a></li>
             <?php if($this->isLoggedIn) : ?>
             <li><a href="/posts/newPost">New Post</a></li>
             <?php else : ?>

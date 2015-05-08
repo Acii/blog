@@ -16,10 +16,18 @@
             <td><?= htmlspecialchars($post['title']) ?></td>
             <td><?= htmlspecialchars($post['description']) ?></td>
             <td><?= $post['dataCreate'] ?></td> 
-            <td><?= htmlspecialchars($post['name']) ?></td> 
-            
-            
-            
+            <td><?= htmlspecialchars($post['name']) ?></td>   
+        </tr>
+    <?php  endforeach ?>
+</table>
+<table>
+    <tr>
+        <th>Title</th>
+    </tr>
+    <?php foreach ($this->tags as $tag) :   ?>
+        <tr>        	
+            <td><?= htmlspecialchars($tag['title']) ?></td>
+ 
         </tr>
     <?php  endforeach ?>
 </table>

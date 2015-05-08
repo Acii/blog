@@ -1,16 +1,19 @@
 <?php
 
 class PostsModel extends BaseModel {
-    public function getAll() {
-		$statement = self::$db->query(
-			"SELECT posts.id, posts.title, posts.description, posts.dataCreate, users.name, tags.title AS tagTitle FROM posts 
-			LEFT JOIN poststags ON posts.id = poststags.postId
-			LEFT JOIN tags ON poststags.tagId = tags.id
+	
+	public function getFilterdPosts($from, $size) {
+		$statement = self::$db->prepare(
+			"SELECT posts.id, posts.title, posts.description, posts.dataCreate, users.name FROM posts 
 			INNER JOIN users ON posts.authorId = users.id
-			ORDER BY posts.dataCreate DESC");
-		$result = $statement->fetch_all(MYSQLI_ASSOC);
-        return $result;
-    }
+			LIMIT ?,?
+			");
+		$statement->bind_param("ii", intval($from), intval($size));
+		$statement->execute();
+		$result = $statement->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+		 
+	 }
 	
     public function getPost($id) {
         $statementPost = self::$db->prepare(
@@ -64,15 +67,18 @@ class PostsModel extends BaseModel {
         $postStatement->bind_param("ssi", $title, $description, $resultUser['id']);
         $postStatement->execute();
 		
-		$newPostStatement = self::$db->prepare("SELECT MAX(id) FROM posts");
+		$newPostStatement = self::$db->prepare("SELECT id FROM posts WHERE title = ?");
+		
+		$newPostStatement->bind_param("s", $title);
 		$newPostStatement->execute();
 		$resultNewPost = $newPostStatement->get_result()->fetch_assoc();
+		
 
 		
 		foreach ($tagsId as $tagId) {
 			$postsTagsStatement = self::$db->prepare(
             	"INSERT INTO poststags (postId, tagId) VALUES(?,?)");
-       		 $postsTagsStatement->bind_param("ii", $resultNewPost['MAX(id)'], $tagId['id']);
+       		 $postsTagsStatement->bind_param("ii", $resultNewPost['id'], $tagId['id']);
        		 $postsTagsStatement->execute();
 		}
 		return TRUE;
@@ -98,5 +104,18 @@ class PostsModel extends BaseModel {
         $statement->execute();
         return $statement->affected_rows > 0;
 	 }
+	 public function getTags($postId) {
+	 	$statementTag = self::$db->prepare(
+            "SELECT poststags.postId, tags.title FROM poststags 
+            JOIN tags ON poststags.tagId = tags.id WHERE poststags.postId = ?");
+		$statementTag->bind_param("i", $postId);
+		$statementTag->execute();
+		$resultTag = $statementTag->get_result();
+        return $resultTag->fetch_all(MYSQLI_ASSOC);
+	 		
+		 
+	 }
+	 
+
 	 
 }

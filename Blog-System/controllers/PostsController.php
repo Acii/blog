@@ -8,8 +8,17 @@ class PostsController extends BaseController {
 		$this->db = new PostsModel();
     }
 
-    public function index() {
-    	 $this->posts = $this->db->getAll();
+    public function index($page=0, $pageSize=10) {
+    	
+		
+		$from = $page * $pageSize;
+		$this->page = $page;
+		$this->pageSize = $pageSize;
+		
+    	$this->posts = $this->db->getFilterdPosts(intval($from), intval($pageSize));
+		 
+		 
+		 $this->renderView();
     }
 	
 	public function newPost() {
@@ -24,7 +33,7 @@ class PostsController extends BaseController {
 			if($title != null && $description != null) {
 				if($this->db->createPost($username, $title, $description,$resultTags)) {
 					$this->addInfoMessage("Successful create new post!");
-					//$this->redirect("posts");
+					$this->redirect("posts");
 				}
 			}
 			else {
@@ -38,8 +47,8 @@ class PostsController extends BaseController {
 		$this->title = "Post";
 		if($postId > 0) {
 			$this->posts = $this->db->getPost($postId);
-			
 			$this->comments = $this->db->getComment($postId);
+			$this->tags = $this->db->getTags($postId);
 		}
 		else {
 			$this->redirect('posts');

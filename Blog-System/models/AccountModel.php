@@ -7,6 +7,7 @@ class AccountModel extends BaseModel {
 		$statement->bind_param("s",$username);
 		$statement->execute();
 		$result = $statement->get_result()->fetch_assoc();
+		
 		if($result['COUNT(id)']) {
 			return FALSE;
 		}
@@ -18,7 +19,6 @@ class AccountModel extends BaseModel {
 		$registerStatement->execute();
 		
 		return TRUE;
-		
 	}
 	
 	public function login($username, $password) {

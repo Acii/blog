@@ -7,10 +7,12 @@ abstract class BaseController {
     protected $isViewRendered = false;
     protected $isPost = false;
 	protected $isLoggedIn;
+	protected $validationErrors;
 
     function __construct($controllerName, $actionName) {
         $this->controllerName = $controllerName;
         $this->actionName = $actionName;
+		
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->isPost = true;
         }
@@ -22,12 +24,10 @@ abstract class BaseController {
         $this->onInit();
     }
 
-    public function onInit() {
-        // Implement initializing logic in the subclasses
+    public function onInit() {        
     }
 
-    public function index() {
-        // Implement the default action in the subclasses
+    public function index() {       
     }
 
     public function renderView($viewName = null, $includeLayout = true) {
@@ -37,11 +37,13 @@ abstract class BaseController {
             }
             $viewFileName = 'views/' . $this->controllerName
                 . '/' . $viewName . '.php';
+				
             if ($includeLayout) {
                 $headerFile = 'views/layouts/' . $this->layoutName . '/header.php';
                 include_once($headerFile);
             }
             include_once($viewFileName);
+			
             if ($includeLayout) {
                 $footerFile = 'views/layouts/' . $this->layoutName . '/footer.php';
                 include_once($footerFile);
@@ -79,6 +81,14 @@ abstract class BaseController {
 			$this->addErrorMessage("Please login first!");
 			$this->redirect('account', 'login');
 		}
+	}
+	
+	public function addValidationError($field, $message) {
+		$this->validationErrors[$field] = $message;
+	}
+	
+	public function getValidationError($field) {
+		return $this->validationErrors[$field];
 	}
 
     function addMessage($msg, $type) {

@@ -9,14 +9,10 @@ class PostsController extends BaseController {
     }
 
     public function index($page=0, $pageSize=10) {
-    	
-		
 		$from = $page * $pageSize;
 		$this->page = $page;
 		$this->pageSize = $pageSize;
-		
-    	$this->posts = $this->db->getFilterdPosts(intval($from), intval($pageSize));
-		 
+    	$this->posts = $this->db->getFilterdPosts(intval($from), intval($pageSize));		 
 		 
 		 $this->renderView();
     }
@@ -24,10 +20,22 @@ class PostsController extends BaseController {
 	public function newPost() {
 		$this->authorize();
 		$this->title = "New Post";
+		
 		if ($this->isPost) {
 			$username = $_SESSION['username'];
+			
 			$title = $_POST['title'];
+			if(strlen($title) < 5){
+				$this->addErrorMessage("The title lenght should be greater than 5");
+				return $this->renderView(__FUNCTION__);
+			}
+			
 			$description = $_POST['description'];
+			if(strlen($description) < 20){
+				$this->addErrorMessage("The description lenght should be greater than 20");
+				return $this->renderView(__FUNCTION__);
+			}
+			
 			$tags = $_POST['tags'];
 			$resultTags = preg_split("/[\s,]+/", $tags);					
 			if($title != null && $description != null) {
@@ -59,15 +67,32 @@ class PostsController extends BaseController {
 		$postId = intval($id);
 		if($postId > 0){
 			if($this->isPost) {
-				$name = $_POST['name'];
+				if($_SESSION['username']){
+					$name = $_SESSION['username'];
+				}
+				else {
+					$name = $_POST['name'];
+				}
+				
+				if(strlen($name) < 3){
+					$this->addErrorMessage("The name lenght should be greater than 3");
+					return $this->redirectToPost($id);
+				}
 				$email = $_POST['email'];
+				
 				$comment = $_POST['content'];
+				if(strlen($comment) < 20){
+					$this->addErrorMessage("The comment lenght should be greater than 20");
+					return $this->redirectToPost($id);
+				}
+				
 				if($email != null){
 					if($this->db->addComment($postId, $name, $email, $comment)){
 						$this->addInfoMessage("Successful create new comment!");
 						$this->redirectToPost($postId);
 					}
 				}
+				
 				if($this->db->addComment($postId, $name, $email = null, $comment)){
 					$this->addInfoMessage("Successful create new comment!");
 					$this->redirectToPost($postId);

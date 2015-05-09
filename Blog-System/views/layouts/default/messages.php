@@ -1,11 +1,9 @@
 <?php
 if (isset($_SESSION['messages'])) {
-    echo '<ul>';
     foreach ($_SESSION['messages'] as $msg) {
-        echo '<li class="' . $msg['type'] . '">';
+        echo '<div class="alert alert-info text-center ' . $msg['type'] . '">';
         echo htmlspecialchars($msg['text']);
-        echo '</li>';
+        echo '</div>';
     }
-    echo '</ul>';
     unset($_SESSION['messages']);
 }

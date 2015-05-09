@@ -9,21 +9,40 @@ class AccountController extends BaseController {
 	
 	public function register() {
 		if($this->isPost){
+			
 			$name = $_POST['username'];
-			if(strlen($name) < 3 || $name == null ){
-				$this->addErrorMessage("Username is invalid!");
-				$this->redirect("account", 'register');
+			if(strlen($name) < 3){
+				$this->addErrorMessage("The username lenght should be greater than 3");
+				return $this->renderView(__FUNCTION__);
 			}
+			
 			$password = $_POST['password'];
+			if(strlen($password) < 3) {
+				$this->addErrorMessage("The password lenght should be greater than 3");
+				return $this->renderView(__FUNCTION__);
+			}
+			
+			$cpassword = $_POST['confirmPassword'];
+			if(strlen($cpassword) < 3) {
+				$this->addErrorMessage("The password lenght should be greater than 3");
+				return $this->renderView(__FUNCTION__);
+			}
+			
+			if($password != $cpassword){
+				$this->addErrorMessage("The passwords don't match");
+				return $this->renderView(__FUNCTION__);
+			}
+			
 			if($this->db->register($name, $password)){
 				$_SESSION['username'] = $name;
 				$this->addInfoMessage("Successful register!");
 				$this->redirect("posts");
 			}
 			else {
-				$this->addErrorMessage("Register failed!");
+				$this->addErrorMessage("Username there!");
 			}
 		}
+		
 		$this->renderView(__FUNCTION__);
 	}
 	
@@ -41,6 +60,7 @@ class AccountController extends BaseController {
 				$this->addErrorMessage("Login failed!");
 			}
 		}
+		
 		$this->renderView(__FUNCTION__);
 	}
 	
